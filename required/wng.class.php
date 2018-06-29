@@ -78,17 +78,12 @@ class wng
      * Construct a new instance
      *
      * @param string $consumer_key If you don't have a consumer key, please go on https://cas.whyno.group/request_credential
-     *
-     * @throws \Exception if one parameter is missing or with bad value
      */
     public function __construct($consumer_key = null) {
-      try {
-        if(!isset($consumer_key) || empty($consumer_key)){
-          throw new \Exception("InvalidParameterException: missing consumer_key");
-        }
+      if(isset($consumer_key) && !empty($consumer_key)){
         $this->consumer_key         = $consumer_key;
-        return true;
-      } catch (\Exception $e) { return $e->getMessage(); }
+      }
+      return true;
     }
     /**
      * Wrap call to Wng APIs for GET requests
@@ -198,12 +193,15 @@ class wng
        * @return array
        */
         public function prepareHeaders(){
-            return array(
-              "cache-control: no-cache",
-              "x-wng-consumer: {$this->consumer_key}",
-              "x-wng-endpoint: {$this->endpoint}",
-              "x-wng-method: {$this->method}"
-            );
+          $headers = array(
+            "cache-control: no-cache",
+            "x-wng-endpoint: {$this->endpoint}",
+            "x-wng-method: {$this->method}"
+          );
+          if ($this->consumer_key != null) {
+            array_push($headers, "x-wng-consumer: {$this->consumer_key}");
+          }
+          return $headers;
         }
       /**
        * Send request to Api
